@@ -1,0 +1,25 @@
+[project]
+name = "banking-agent"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Akshay Siv", email = "akshaysiv95@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "azure-ai-projects>=2.6.1",
+    "azure-identity>=1.25.3",
+    "azure-search-documents>=12.0.0",
+    "fastapi>=0.141.1",
+    "pydantic-settings>=2.15.0",
+    "python-dotenv>=1.2.3",
+    "uvicorn>=0.53.0",
+]
+
+[project.scripts]
+banking-agent = "banking_agent:main"
+
+[build-system]
+requires = ["uv_build>=0.12.8,<0.13.0"]
+build-backend = "uv_build"
