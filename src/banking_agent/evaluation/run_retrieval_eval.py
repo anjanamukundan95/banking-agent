@@ -11,7 +11,9 @@ from banking_agent.services.rag import search_knowledge
 
 def main():
     recall_scores = []
-    precision_scores = []
+    precision_at_1_scores = []
+    precision_at_3_scores = []
+    precision_at_5_scores = []
     reciprocal_rank_scores = []
     ndcg_scores = []
 
@@ -19,7 +21,7 @@ def main():
         response = search_knowledge(
             KnowledgeSearchRequest(
                 query=test_case.query,
-                top_k=5,
+                top_k=3,
             )
         )
 
@@ -27,13 +29,15 @@ def main():
 
         relevant = set(test_case.relevant_sources)
 
-        recall_scores.append(recall_at_k(retrieved, relevant, 5))
+        recall_scores.append(recall_at_k(retrieved, relevant, 3))
 
         reciprocal_rank_scores.append(reciprocal_rank(retrieved, relevant))
 
-        ndcg_scores.append(ndcg_at_k(retrieved, relevant, 5))
+        ndcg_scores.append(ndcg_at_k(retrieved, relevant, 3))
 
-        precision_scores.append(precision_at_k(retrieved, relevant, 5))
+        # precision_at_1_scores.append(precision_at_k(retrieved, relevant, 1))
+        precision_at_3_scores.append(precision_at_k(retrieved, relevant, 3))
+        # precision_at_5_scores.append(precision_at_k(retrieved, relevant, 5))
 
         print(f"\nQuery: {test_case.query}")
         print(f"Retrieved: {retrieved}")
@@ -46,7 +50,9 @@ def main():
 
     print(f"NDCG@5: {sum(ndcg_scores) / len(ndcg_scores):.3f}")
 
-    print(f"Precision@5: {sum(precision_scores) / len(precision_scores):.3f}")
+    # print(f"Precision@1: {sum(precision_at_1_scores) / len(precision_at_1_scores):.3f}")
+    print(f"Precision@3: {sum(precision_at_3_scores) / len(precision_at_3_scores):.3f}")
+    # print(f"Precision@5: {sum(precision_at_5_scores) / len(precision_at_5_scores):.3f}")
 
 
 if __name__ == "__main__":
