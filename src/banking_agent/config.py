@@ -7,6 +7,8 @@ class Settings(BaseSettings):
     azure_search_endpoint: str
     azure_search_index_name: str
     azure_search_semantic_configuration: str
+    azure_ai_agent_name: str
+
 
     model_config = SettingsConfigDict(
         env_file=".env",

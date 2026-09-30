@@ -19,7 +19,14 @@ search_client = SearchClient(
 def search_knowledge(
     request: KnowledgeSearchRequest,
 ) -> KnowledgeSearchResponse:
+    """
+    Search the banking knowledge base for relevant policies,
+    fees, account requirements, card information, KYC procedures,
+    transactions, and complaint handling procedures.
 
+    Use this tool when answering questions that require information
+    from the banking knowledge base.
+    """
     vector_query = VectorizableTextQuery(
         text=request.query,
         k_nearest_neighbors=request.top_k,

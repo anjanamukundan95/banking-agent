@@ -28,3 +28,19 @@ class KnowledgeChunk(BaseModel):
 class KnowledgeSearchResponse(BaseModel):
     query: str
     results: list[KnowledgeChunk]
+
+class ChatRequest(BaseModel):
+    message: str = Field(
+        ...,
+        min_length=1,
+        max_length=2000,
+    )
+
+
+class ChatResponse(BaseModel):
+    answer: str
+    citations: list["Citation"] = Field(default_factory=list)
+
+class Citation(BaseModel):
+    citation_id: str
+    title: str
