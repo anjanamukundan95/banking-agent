@@ -1,38 +1,22 @@
 from azure.ai.projects.models import (
-    FunctionTool,
     PromptAgentDefinition,
     Tool,
 )
 
 from banking_agent.client import project_client
 from banking_agent.config import settings
-
-search_knowledge_tool = FunctionTool(
-    name="search_knowledge",
-    description=(
-        "Search the banking knowledge base for policies and procedures "
-        "related to accounts, cards, fees, KYC, transactions, and complaints. "
-        "Use this tool when the user's question requires information "
-        "from the banking knowledge base."
-    ),
-    parameters={
-        "type": "object",
-        "properties": {
-            "query": {
-                "type": "string",
-                "description": ("The natural-language banking question to search for."),
-            }
-        },
-        "required": ["query"],
-        "additionalProperties": False,
-    },
-    strict=True,
+from banking_agent.tools.banking_tools import (
+    get_account_balance_tool,
+    get_recent_transactions_tool,
 )
+from banking_agent.tools.search_kb_tool import search_knowledge_tool
 
 
 def create_banking_agent():
     tools: list[Tool] = [
         search_knowledge_tool,
+        get_account_balance_tool,
+        get_recent_transactions_tool,
     ]
 
     agent = project_client.agents.create_version(

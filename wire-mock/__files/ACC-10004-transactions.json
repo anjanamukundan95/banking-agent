@@ -1,0 +1,20 @@
+[
+  {
+    "transactionId": "TXN-40001",
+    "date": "2026-09-30",
+    "description": "Fixed Deposit Maturity",
+    "type": "CREDIT",
+    "amount": 25000.00,
+    "currency": "AED",
+    "status": "COMPLETED"
+  },
+  {
+    "transactionId": "TXN-40002",
+    "date": "2026-09-29",
+    "description": "Property Management",
+    "type": "DEBIT",
+    "amount": 8500.00,
+    "currency": "AED",
+    "status": "COMPLETED"
+  }
+]

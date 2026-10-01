@@ -1,0 +1,29 @@
+[
+  {
+    "transactionId": "TXN-30001",
+    "date": "2026-09-30",
+    "description": "Etisalat",
+    "type": "DEBIT",
+    "amount": 299.00,
+    "currency": "AED",
+    "status": "COMPLETED"
+  },
+  {
+    "transactionId": "TXN-30002",
+    "date": "2026-09-28",
+    "description": "Talabat",
+    "type": "DEBIT",
+    "amount": 86.50,
+    "currency": "AED",
+    "status": "COMPLETED"
+  },
+  {
+    "transactionId": "TXN-30003",
+    "date": "2026-09-26",
+    "description": "Cash Deposit",
+    "type": "CREDIT",
+    "amount": 2000.00,
+    "currency": "AED",
+    "status": "COMPLETED"
+  }
+]

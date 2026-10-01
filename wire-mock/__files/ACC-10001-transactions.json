@@ -1,0 +1,29 @@
+[
+  {
+    "transactionId": "TXN-10001",
+    "date": "2026-09-30",
+    "description": "Carrefour",
+    "type": "DEBIT",
+    "amount": 245.50,
+    "currency": "AED",
+    "status": "COMPLETED"
+  },
+  {
+    "transactionId": "TXN-10002",
+    "date": "2026-09-29",
+    "description": "Salary Credit",
+    "type": "CREDIT",
+    "amount": 18000.00,
+    "currency": "AED",
+    "status": "COMPLETED"
+  },
+  {
+    "transactionId": "TXN-10003",
+    "date": "2026-09-28",
+    "description": "Amazon UAE",
+    "type": "DEBIT",
+    "amount": 320.00,
+    "currency": "AED",
+    "status": "COMPLETED"
+  }
+]

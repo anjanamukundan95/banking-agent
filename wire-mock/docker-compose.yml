@@ -1,0 +1,8 @@
+services:
+  wiremock:
+    build:
+      context: .
+      dockerfile: dockerfile
+    container_name: banking-wiremock
+    ports:
+      - "8090:8080"

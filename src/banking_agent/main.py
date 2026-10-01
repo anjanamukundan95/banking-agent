@@ -7,10 +7,10 @@ app = FastAPI(title="Banking Agent", description="Banking Agent API", version="1
 
 
 @app.get("/health")
-async def health_check():
+def health_check():
     return {"status": "ok"}
 
 
 @app.post("/api/v1/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest):
-    return run_banking_agent(request.message)
+    return await run_banking_agent(request.message)

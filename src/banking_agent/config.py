@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     azure_search_index_name: str
     azure_search_semantic_configuration: str
     azure_ai_agent_name: str
+    banking_api_base_url: str
 
 
     model_config = SettingsConfigDict(

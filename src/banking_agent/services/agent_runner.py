@@ -8,14 +8,13 @@ from banking_agent.config import settings
 from banking_agent.models.rag import (
     ChatResponse,
     Citation,
-    KnowledgeSearchRequest,
 )
-from banking_agent.services.rag import search_knowledge
+from banking_agent.services.tool_executor import execute_tool
 
-_CITATION_PATTERN = re.compile(r"\[(\d+)\]")
+_CITATION_PATTERN = re.compile(r"\*\*\[(\d+)\]\*\*")
 
 
-def run_banking_agent(question: str) -> ChatResponse:
+async def run_banking_agent(question: str) -> ChatResponse:
     openai_client = project_client.get_openai_client()
 
     conversation = openai_client.conversations.create()
@@ -32,32 +31,33 @@ def run_banking_agent(question: str) -> ChatResponse:
     )
 
     tool_outputs: ResponseInputParam = []
-
     retrieved_chunks = []
 
     for item in response.output:
         if item.type != "function_call":
             continue
 
-        if item.name != "search_knowledge":
-            continue
-
         arguments = json.loads(item.arguments)
 
-        request = KnowledgeSearchRequest(
-            query=arguments["query"],
-            top_k=3,
+        result = await execute_tool(
+            item.name,
+            arguments,
         )
 
-        search_response = search_knowledge(request)
-
-        retrieved_chunks.extend(search_response.results)
+        if item.name == "search_knowledge":
+            retrieved_chunks.extend(
+                result.results
+            )
 
         tool_outputs.append(
             {
                 "type": "function_call_output",
                 "call_id": item.call_id,
-                "output": json.dumps(search_response.model_dump()),
+                "output": json.dumps(
+                    result.model_dump()
+                    if hasattr(result, "model_dump")
+                    else result
+                ),
             }
         )
 
@@ -95,10 +95,15 @@ def _validate_and_build_citations(
     answer: str,
     retrieved_chunks,
 ) -> list[Citation]:
+    citation_numbers = {
+        int(match)
+        for match in _CITATION_PATTERN.findall(answer)
+    }
 
-    citation_numbers = {int(match) for match in _CITATION_PATTERN.findall(answer)}
-
-    citations_by_id = {chunk.citation_id: chunk for chunk in retrieved_chunks}
+    citations_by_id = {
+        chunk.citation_id: chunk
+        for chunk in retrieved_chunks
+    }
 
     citations: list[Citation] = []
 
@@ -108,8 +113,15 @@ def _validate_and_build_citations(
         chunk = citations_by_id.get(citation_id)
 
         if chunk is None:
-            raise ValueError(f"Invalid citation {citation_id} returned by agent")
+            raise ValueError(
+                f"Invalid citation {citation_id} returned by agent"
+            )
 
-        citations.append(Citation(citation_id=chunk.citation_id, title=chunk.title))
+        citations.append(
+            Citation(
+                citation_id=chunk.citation_id,
+                title=chunk.title,
+            )
+        )
 
     return citations

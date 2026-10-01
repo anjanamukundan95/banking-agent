@@ -1,0 +1,16 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/api/v1/accounts/([^/]+)/transactions"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "bodyFileName": "{{request.pathSegments.[3]}}-transactions.json",
+    "transformers": [
+      "response-template"
+    ]
+  }
+}

@@ -23,4 +23,3 @@ search_knowledge_tool = FunctionTool(
     },
     strict=True,
 )
-
