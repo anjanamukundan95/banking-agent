@@ -1,4 +1,3 @@
-    # Get the OpenAI client for Responses API
 from banking_agent.client import openai_client
 from banking_agent.config import settings
 

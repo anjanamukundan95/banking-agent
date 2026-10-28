@@ -1,9 +1,13 @@
+import logging
+
 from azure.ai.projects.models import (
     PromptAgentDefinition,
     Tool,
 )
 
 from banking_agent.client import project_client
+
+logger = logging.getLogger(__name__)
 from banking_agent.config import settings
 from banking_agent.tools.banking_tools import (
     get_account_balance_tool,
@@ -19,6 +23,7 @@ def create_banking_agent():
         get_recent_transactions_tool,
     ]
 
+    logger.info("Creating banking agent: %s", settings.azure_ai_agent_name)
     agent = project_client.agents.create_version(
         agent_name=settings.azure_ai_agent_name,
         definition=PromptAgentDefinition(

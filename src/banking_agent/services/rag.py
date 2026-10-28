@@ -1,8 +1,12 @@
+import logging
+
 from azure.identity import DefaultAzureCredential
 from azure.search.documents import SearchClient
 from azure.search.documents.models import VectorizableTextQuery
 
 from banking_agent.config import settings
+
+logger = logging.getLogger(__name__)
 from banking_agent.models.rag import (
     KnowledgeChunk,
     KnowledgeSearchRequest,
@@ -27,6 +31,8 @@ def search_knowledge(
     Use this tool when answering questions that require information
     from the banking knowledge base.
     """
+    logger.debug("Searching knowledge base: query=%r top_k=%d", request.query, request.top_k)
+
     vector_query = VectorizableTextQuery(
         text=request.query,
         k_nearest_neighbors=request.top_k,

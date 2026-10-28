@@ -1,3 +1,4 @@
+import logging
 from typing import Any
 
 import jwt
@@ -7,12 +8,14 @@ from jwt import PyJWKClient
 
 from banking_agent.config import settings
 
+logger = logging.getLogger(__name__)
+
 security = HTTPBearer()
 credentials_dependency = Depends(security)
 
-jwks_client = PyJWKClient(
-    settings.auth_jwks_url
-)
+jwks_client = PyJWKClient(settings.auth_jwks_url)
+
+
 def get_current_user(
     credentials: HTTPAuthorizationCredentials = credentials_dependency,
 ) -> dict[str, Any]:
@@ -32,6 +35,7 @@ def get_current_user(
         return payload
 
     except jwt.PyJWTError as exc:
+        logger.warning("JWT validation failed: %s", exc)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or expired access token",

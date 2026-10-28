@@ -1,5 +1,8 @@
 import json
+import logging
 import re
+
+logger = logging.getLogger(__name__)
 
 from fastapi import HTTPException
 from openai.types.responses.response_input_param import ResponseInputParam
@@ -121,9 +124,8 @@ def _validate_and_build_citations(
         chunk = citations_by_id.get(citation_id)
 
         if chunk is None:
-            raise ValueError(
-                f"Invalid citation {citation_id} returned by agent"
-            )
+            logger.warning("Agent returned citation %s but it was not in retrieved chunks — skipping", citation_id)
+            continue
 
         citations.append(
             Citation(

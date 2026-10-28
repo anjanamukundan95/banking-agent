@@ -14,5 +14,6 @@ def test_ask_model():
     assert response is not None
     assert isinstance(response, str)
     
-test_project_client_initialization()
-test_ask_model()
+if __name__ == "__main__":
+    test_project_client_initialization()
+    test_ask_model()
