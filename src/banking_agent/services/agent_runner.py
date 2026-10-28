@@ -1,6 +1,7 @@
 import json
 import re
 
+from fastapi import HTTPException
 from openai.types.responses.response_input_param import ResponseInputParam
 
 from banking_agent.client import project_client
@@ -14,7 +15,13 @@ from banking_agent.services.tool_executor import execute_tool
 _CITATION_PATTERN = re.compile(r"\*\*\[(\d+)\]\*\*")
 
 
-async def run_banking_agent(question: str) -> ChatResponse:
+async def run_banking_agent(question: str, current_user: dict) -> ChatResponse:
+    user_id = current_user.get("oid")
+    if not user_id:
+        raise HTTPException(
+            status_code=401,
+            detail="Token does not contain a valid user identity",
+        )
     openai_client = project_client.get_openai_client()
 
     conversation = openai_client.conversations.create()
@@ -42,6 +49,7 @@ async def run_banking_agent(question: str) -> ChatResponse:
         result = await execute_tool(
             item.name,
             arguments,
+            user_id=user_id,
         )
 
         if item.name == "search_knowledge":

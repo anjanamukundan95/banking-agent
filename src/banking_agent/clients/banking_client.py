@@ -27,6 +27,5 @@ class BankingClient:
                 url,
                 params={"limit": limit},
             )
-
-        response.raise_for_status()
-        return response.json()
+            response.raise_for_status()
+            return response.json()

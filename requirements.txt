@@ -7,3 +7,5 @@ azure-identity
 azure-search-documents
 pytest
 httpx
+pyJWT
+cryptography
