@@ -10,3 +10,4 @@ httpx
 pyJWT
 cryptography
 azure-ai-contentsafety
+azure-monitor-opentelemetry
