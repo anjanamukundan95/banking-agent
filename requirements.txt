@@ -9,3 +9,4 @@ pytest
 httpx
 pyJWT
 cryptography
+azure-ai-contentsafety

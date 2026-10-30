@@ -13,12 +13,19 @@ from banking_agent.models.rag import (
     ChatResponse,
     Citation,
 )
+from banking_agent.services.content_safety import check_text
 from banking_agent.services.tool_executor import execute_tool
 
 _CITATION_PATTERN = re.compile(r"\*\*\[(\d+)\]\*\*")
 
 
 async def run_banking_agent(question: str, current_user: dict) -> ChatResponse:
+    input_check = check_text(question)
+    if input_check["blocked"]:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Message blocked by Content Safety: {input_check['reason']}",
+        )
     user_id = current_user.get("oid")
     if not user_id:
         raise HTTPException(
@@ -56,18 +63,14 @@ async def run_banking_agent(question: str, current_user: dict) -> ChatResponse:
         )
 
         if item.name == "search_knowledge":
-            retrieved_chunks.extend(
-                result.results
-            )
+            retrieved_chunks.extend(result.results)
 
         tool_outputs.append(
             {
                 "type": "function_call_output",
                 "call_id": item.call_id,
                 "output": json.dumps(
-                    result.model_dump()
-                    if hasattr(result, "model_dump")
-                    else result
+                    result.model_dump() if hasattr(result, "model_dump") else result
                 ),
             }
         )
@@ -90,31 +93,33 @@ async def run_banking_agent(question: str, current_user: dict) -> ChatResponse:
     )
 
     answer = final_response.output_text
+    output_check = check_text(answer)
+    if output_check["blocked"]:
+        logger.warning("Agent output blocked by Content Safety")
+        answer = "I'm unable to provide a response to that request."
 
-    citations = _validate_and_build_citations(
-        answer,
-        retrieved_chunks,
-    )
+    citations = _validate_and_build_citations(answer, retrieved_chunks)
+    return ChatResponse(answer=answer, citations=citations)
+    # answer = final_response.output_text
 
-    return ChatResponse(
-        answer=answer,
-        citations=citations,
-    )
+    # citations = _validate_and_build_citations(
+    #     answer,
+    #     retrieved_chunks,
+    # )
+
+    # return ChatResponse(
+    #     answer=answer,
+    #     citations=citations,
+    # )
 
 
 def _validate_and_build_citations(
     answer: str,
     retrieved_chunks,
 ) -> list[Citation]:
-    citation_numbers = {
-        int(match)
-        for match in _CITATION_PATTERN.findall(answer)
-    }
+    citation_numbers = {int(match) for match in _CITATION_PATTERN.findall(answer)}
 
-    citations_by_id = {
-        chunk.citation_id: chunk
-        for chunk in retrieved_chunks
-    }
+    citations_by_id = {chunk.citation_id: chunk for chunk in retrieved_chunks}
 
     citations: list[Citation] = []
 
@@ -124,7 +129,10 @@ def _validate_and_build_citations(
         chunk = citations_by_id.get(citation_id)
 
         if chunk is None:
-            logger.warning("Agent returned citation %s but it was not in retrieved chunks — skipping", citation_id)
+            logger.warning(
+                "Agent returned citation %s but it was not in retrieved chunks — skipping",
+                citation_id,
+            )
             continue
 
         citations.append(

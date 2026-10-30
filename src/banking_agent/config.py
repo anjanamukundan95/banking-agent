@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     azure_search_semantic_configuration: str
     azure_ai_agent_name: str
     banking_api_base_url: str
+    content_safety_endpoint: str 
 
     # Microsoft Entra ID
     auth_issuer: str
