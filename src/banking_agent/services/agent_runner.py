@@ -100,17 +100,6 @@ async def run_banking_agent(question: str, current_user: dict) -> ChatResponse:
 
     citations = _validate_and_build_citations(answer, retrieved_chunks)
     return ChatResponse(answer=answer, citations=citations)
-    # answer = final_response.output_text
-
-    # citations = _validate_and_build_citations(
-    #     answer,
-    #     retrieved_chunks,
-    # )
-
-    # return ChatResponse(
-    #     answer=answer,
-    #     citations=citations,
-    # )
 
 
 def _validate_and_build_citations(
