@@ -11,3 +11,4 @@ pyJWT
 cryptography
 azure-ai-contentsafety
 azure-monitor-opentelemetry
+azure-ai-textanalytics

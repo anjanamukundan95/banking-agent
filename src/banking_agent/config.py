@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     banking_api_base_url: str
     content_safety_endpoint: str
     application_insights_connection_string: str
+    language_endpoint: str
 
     # Microsoft Entra ID
     auth_issuer: str

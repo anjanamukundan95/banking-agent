@@ -14,6 +14,7 @@ from banking_agent.models.rag import (
     Citation,
 )
 from banking_agent.services.content_safety import check_text
+from banking_agent.services.language_detection import detect_language
 from banking_agent.services.tool_executor import execute_tool
 
 _CITATION_PATTERN = re.compile(r"\*\*\[(\d+)\]\*\*")
@@ -32,13 +33,17 @@ async def run_banking_agent(question: str, current_user: dict) -> ChatResponse:
             status_code=401,
             detail="Token does not contain a valid user identity",
         )
+    # detect language and instruct agent explicitly                                                                                                                                
+    lang = detect_language(question)                                                                                                                                               
+    lang_label = "Arabic" if lang == "ar" else "English"                                                                                                                           
+    augmented_question = f"{question}\n\n[System: Please respond in {lang_label}]"                                                                                                                                                               
     openai_client = project_client.get_openai_client()
 
     conversation = openai_client.conversations.create()
 
     response = openai_client.responses.create(
         conversation=conversation.id,
-        input=question,
+        input=augmented_question,
         extra_body={
             "agent_reference": {
                 "name": settings.azure_ai_agent_name,
