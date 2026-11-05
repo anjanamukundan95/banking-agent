@@ -2,10 +2,11 @@ import json
 import logging
 import re
 
-logger = logging.getLogger(__name__)
-
 from fastapi import HTTPException
+from openai import BadRequestError
 from openai.types.responses.response_input_param import ResponseInputParam
+
+logger = logging.getLogger(__name__)
 
 from banking_agent.client import project_client
 from banking_agent.config import settings
@@ -41,16 +42,22 @@ async def run_banking_agent(question: str, current_user: dict) -> ChatResponse:
 
     conversation = openai_client.conversations.create()
 
-    response = openai_client.responses.create(
-        conversation=conversation.id,
-        input=augmented_question,
-        extra_body={
-            "agent_reference": {
-                "name": settings.azure_ai_agent_name,
-                "type": "agent_reference",
-            }
-        },
-    )
+    try:
+        response = openai_client.responses.create(
+            conversation=conversation.id,
+            input=augmented_question,
+            extra_body={
+                "agent_reference": {
+                    "name": settings.azure_ai_agent_name,
+                    "type": "agent_reference",
+                }
+            },
+        )
+    except BadRequestError as e:
+        if "content_filter" in str(e):
+            logger.warning("Foundry content filter blocked input: %s", e)
+            raise HTTPException(status_code=400, detail="Message blocked by content filter")
+        raise
 
     tool_outputs: ResponseInputParam = []
     retrieved_chunks = []
@@ -86,16 +93,22 @@ async def run_banking_agent(question: str, current_user: dict) -> ChatResponse:
             citations=[],
         )
 
-    final_response = openai_client.responses.create(
-        conversation=conversation.id,
-        input=tool_outputs,
-        extra_body={
-            "agent_reference": {
-                "name": settings.azure_ai_agent_name,
-                "type": "agent_reference",
-            }
-        },
-    )
+    try:
+        final_response = openai_client.responses.create(
+            conversation=conversation.id,
+            input=tool_outputs,
+            extra_body={
+                "agent_reference": {
+                    "name": settings.azure_ai_agent_name,
+                    "type": "agent_reference",
+                }
+            },
+        )
+    except BadRequestError as e:
+        if "content_filter" in str(e):
+            logger.warning("Foundry content filter blocked output: %s", e)
+            raise HTTPException(status_code=400, detail="Message blocked by content filter")
+        raise
 
     answer = final_response.output_text
     output_check = check_text(answer)
