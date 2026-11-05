@@ -1,4 +1,9 @@
+from typing import Annotated
+
 from pydantic import BaseModel, Field
+from pydantic.functional_validators import BeforeValidator
+
+StrippedStr = Annotated[str, BeforeValidator(lambda v: v.strip())]
 
 
 class KnowledgeSearchRequest(BaseModel):
@@ -30,7 +35,7 @@ class KnowledgeSearchResponse(BaseModel):
     results: list[KnowledgeChunk]
 
 class ChatRequest(BaseModel):
-    message: str = Field(
+    message: StrippedStr = Field(
         ...,
         min_length=1,
         max_length=2000,
